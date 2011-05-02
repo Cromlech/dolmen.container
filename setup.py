@@ -22,6 +22,7 @@ install_requires = [
     'zope.location',
     'zope.schema',
     'zope.security',
+    'zope.size',
     ]
 
 tests_require = [
