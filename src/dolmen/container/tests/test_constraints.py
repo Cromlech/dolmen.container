@@ -32,22 +32,6 @@ class IBuddy(IContained):
     containers(IBuddyFolder)
 
 
-class IContact(IContained):
-    containers('.IContacts')
-
-
-class IContacts(IContainer):
-    contains(IContact)
-
-
-class Contact:
-    interface.implements(IContact)
-
-
-class Contacts:
-    interface.implements(IContacts)
-
-
 def test_contraints():
     
     class Buddy:
@@ -71,10 +55,24 @@ def test_contraints():
         checkObject(BuddyFolder(), 'x', Contained())
 
 
+class IContact(IContained):
+    containers('.IContacts')
+
+
+class IContacts(IContainer):
+    contains(IContact)
+
+
 def test_constraints_order():
     """In the previous tests, we defined the container first and
     then the items.  We can define these in the opposite order.
     """
+    class Contact:
+        interface.implements(IContact)
+
+    class Contacts:
+        interface.implements(IContacts)
+
     assert checkObject(Contacts(), 'x', Contact()) is None
     assert checkFactory(Contacts(), 'x', Factory(Contact))
 
