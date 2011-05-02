@@ -5,7 +5,7 @@ from pytest import raises
 from doctest import DocTestSuite
 from unittest import TestCase, main, makeSuite, TestSuite
 from zope.interface.verify import verifyObject
-from dolmen.container.btree import BTreeContainer
+from dolmen.container.components import BTreeContainer
 from dolmen.container.interfaces import IBTreeContainer
 
 

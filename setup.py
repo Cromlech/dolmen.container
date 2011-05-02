@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages, Extension
 from os.path import join
 
 name = 'dolmen.container'
@@ -10,9 +10,17 @@ history = open(join('docs', 'HISTORY.txt')).read()
 
 install_requires = [
     'ZODB3 >= 3.10',
-    'zope.component',
-    'zope.interface',
     'setuptools',
+    'zope.broken',
+    'zope.component',
+    'zope.dottedname',
+    'zope.event',
+    'zope.i18nmessageid',
+    'zope.interface',
+    'zope.lifecycleevent',
+    'zope.location',
+    'zope.schema',
+    'zope.security',
     ]
 
 tests_require = [
@@ -44,4 +52,10 @@ setup(name = name,
       extras_require = {
           'test': tests_require,
           },
+      ext_modules=[
+          Extension("dolmen.container._dolmen_container_contained",
+                             [os.path.join("src", "dolmen", "container",
+                                           "_dolmen_container_contained.c")
+                              ], include_dirs=['include']),
+                   ],
       )
