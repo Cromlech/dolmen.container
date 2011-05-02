@@ -139,3 +139,12 @@ class BTreeContainer(Container, Persistent):
         uncontained(self._data[key], self, key)
         del self._data[key]
         l.change(-1)
+
+    def items(self, key=None):
+        return self._data.items(key)
+
+    def keys(self, key=None):
+        return self._data.keys(key)
+
+    def values(self, key=None):
+        return self._data.values(key)

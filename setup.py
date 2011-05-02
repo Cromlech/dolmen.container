@@ -7,6 +7,7 @@ name = 'dolmen.container'
 version = '0.1'
 readme = open(join('src', 'dolmen', 'container', "README.txt")).read()
 history = open(join('docs', 'HISTORY.txt')).read()
+persistent = join("include", "persistent")
 
 install_requires = [
     'ZODB3 >= 3.10',
@@ -52,10 +53,4 @@ setup(name = name,
       extras_require = {
           'test': tests_require,
           },
-      ext_modules=[
-          Extension("dolmen.container._dolmen_container_contained",
-                             [os.path.join("src", "dolmen", "container",
-                                           "_dolmen_container_contained.c")
-                              ], include_dirs=['include']),
-                   ],
       )

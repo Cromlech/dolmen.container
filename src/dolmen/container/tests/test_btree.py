@@ -18,7 +18,7 @@ def checkIterable(iterable):
     # Exhaust the iterator:
     first_time = list(it)
     with raises(StopIteration):
-        it.next
+        it.next()
 
     # Subsequent iterations will return the same values:
     assert list(iterable) == first_time
@@ -40,7 +40,7 @@ def test_stored_length():
     assert bc.__dict__['_BTreeContainer__len']() == 1
 
 
-def test_BTree_container_interface(self):
+def test_BTree_container_interface():
     bc = BTreeContainer()
     assert verifyObject(IBTreeContainer, bc)
 
@@ -49,7 +49,7 @@ def test_BTree_container_interface(self):
     checkIterable(bc.values())
 
 
-def test_empty_items_with_arg(self):
+def test_empty_items_with_arg():
     bc = BTreeContainer()
 
     assert list(bc.items(None)) == list(bc.items())
@@ -61,7 +61,7 @@ def test_empty_items_with_arg(self):
     checkIterable(bc.items("not-there"))
 
 
-def test_empty_keys_with_arg(self):
+def test_empty_keys_with_arg():
     bc = BTreeContainer()
 
     assert list(bc.keys(None)) == list(bc.keys())
@@ -73,7 +73,7 @@ def test_empty_keys_with_arg(self):
     checkIterable(bc.keys("not-there"))
 
 
-def test_empty_values_with_arg(self):
+def test_empty_values_with_arg():
     bc = BTreeContainer()
 
     assert list(bc.values(None)) == list(bc.values())
@@ -85,7 +85,7 @@ def test_empty_values_with_arg(self):
     checkIterable(bc.values("not-there"))
 
 
-def test_non_empty_items_with_arg(self):
+def test_non_empty_items_with_arg():
     bc = BTreeContainer()
     bc["0"] = 1
     bc["1"] = 2
@@ -107,7 +107,7 @@ def test_non_empty_items_with_arg(self):
     checkIterable(bc.items("3"))
 
 
-def test_non_empty_keys_with_arg(self):
+def test_non_empty_keys_with_arg():
     bc = BTreeContainer()
     bc["0"] = 1
     bc["1"] = 2
@@ -129,7 +129,7 @@ def test_non_empty_keys_with_arg(self):
     checkIterable(bc.keys("3"))
 
 
-def test_non_empty_value_with_arg(self):
+def test_non_empty_value_with_arg():
     bc = BTreeContainer()
     bc["0"] = 1
     bc["1"] = 2
@@ -151,7 +151,7 @@ def test_non_empty_value_with_arg(self):
     checkIterable(bc.values("3"))
 
 
-def test_correct_length_when_adding_existing_item(self):
+def test_correct_length_when_adding_existing_item():
     bc = BTreeContainer()
 
     bc[u'x'] = object()

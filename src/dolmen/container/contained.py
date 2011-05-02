@@ -14,8 +14,8 @@ from zope.lifecycleevent import (
     ObjectModifiedEvent, ObjectMovedEvent,
     ObjectAddedEvent, ObjectRemovedEvent)
 
-from dolmen.container._dolmen_container_contained import ContainedProxyBase
-from dolmen.container._dolmen_container_contained import getProxiedObject
+from zope.location import LocationProxy
+from zope.proxy import getProxiedObject
 from dolmen.container import ZopeMessageFactory as _
 from dolmen.container.interfaces import (
     INameChooser, IReservedNames, NameReserved, IContainerModifiedEvent)
@@ -27,6 +27,10 @@ class Contained(object):
     implements(IContained)
 
     __parent__ = __name__ = None
+
+
+class ContainedProxy(LocationProxy):
+    implements(IContained)
 
 
 class ContainerModifiedEvent(ObjectModifiedEvent):
@@ -804,103 +808,3 @@ class NameChooser(object):
         self.checkName(n, object)
 
         return n
-
-
-class DecoratorSpecificationDescriptor(
-    zope.interface.declarations.ObjectSpecificationDescriptor):
-    """Support for interface declarations on decorators
-
-    >>> from zope.interface import *
-    >>> class I1(Interface):
-    ...     pass
-    >>> class I2(Interface):
-    ...     pass
-    >>> class I3(Interface):
-    ...     pass
-    >>> class I4(Interface):
-    ...     pass
-
-    >>> class D1(ContainedProxy):
-    ...   implements(I1)
-
-
-    >>> class D2(ContainedProxy):
-    ...   implements(I2)
-
-    >>> class X:
-    ...   implements(I3)
-
-    >>> x = X()
-    >>> directlyProvides(x, I4)
-
-    Interfaces of X are ordered with the directly-provided interfaces first
-
-    >>> [interface.getName() for interface in list(providedBy(x))]
-    ['I4', 'I3']
-
-    When we decorate objects, what order should the interfaces come in? One
-    could argue that decorators are less specific, so they should come last.
-
-    >>> [interface.getName() for interface in list(providedBy(D1(x)))]
-    ['I4', 'I3', 'I1', 'IContained', 'IPersistent']
-
-    >>> [interface.getName() for interface in list(providedBy(D2(D1(x))))]
-    ['I4', 'I3', 'I1', 'IContained', 'IPersistent', 'I2']
-    """
-    def __get__(self, inst, cls=None):
-        if inst is None:
-            return getObjectSpecification(cls)
-        else:
-            provided = providedBy(getProxiedObject(inst))
-
-            # Use type rather than __class__ because inst is a proxy and
-            # will return the proxied object's class.
-            cls = type(inst)
-            return ObjectSpecification(provided, cls)
-
-
-class DecoratedSecurityCheckerDescriptor(object):
-    """Descriptor for a Decorator that provides a decorated security checker.
-    """
-    def __get__(self, inst, cls=None):
-        if inst is None:
-            return self
-        else:
-            proxied_object = getProxiedObject(inst)
-            checker = getattr(proxied_object, '__Security_checker__', None)
-            if checker is None:
-                checker = selectChecker(proxied_object)
-            wrapper_checker = selectChecker(inst)
-            if wrapper_checker is None:
-                return checker
-            elif checker is None:
-                return wrapper_checker
-            else:
-                return CombinedChecker(wrapper_checker, checker)
-
-
-class ContainedProxyClassProvides(zope.interface.declarations.ClassProvides):
-
-    def __set__(self, inst, value):
-        inst = getProxiedObject(inst)
-        inst.__provides__ = value
-
-    def __delete__(self, inst):
-        inst = getProxiedObject(inst)
-        del inst.__provides__
-
-
-class ContainedProxy(ContainedProxyBase):
-
-    # Prevent proxies from having their own instance dictionaries:
-    __slots__ = ()
-
-    __safe_for_unpickling__ = True
-
-    zope.interface.implements(IContained)
-
-    __providedBy__ = DecoratorSpecificationDescriptor()
-
-    __Security_checker__ = DecoratedSecurityCheckerDescriptor()
-
-ContainedProxy.__provides__ = ContainedProxyClassProvides(ContainedProxy, type)
