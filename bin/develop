@@ -1,0 +1,15 @@
+#!/usr/bin/python
+
+import sys
+sys.path[0:0] = [
+    '/home/trollfot/.buildout/eggs/mr.developer-1.17-py2.6.egg',
+    '/home/trollfot/.buildout/eggs/argparse-1.2.1-py2.6.egg',
+    '/home/trollfot/.buildout/eggs/zc.buildout-1.5.2-py2.6.egg',
+    '/home/trollfot/.buildout/eggs/setuptools-0.6c12dev_r88795-py2.6.egg',
+    ]
+
+
+import mr.developer.develop
+
+if __name__ == '__main__':
+    mr.developer.develop.develop()
