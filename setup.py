@@ -27,6 +27,7 @@ install_requires = [
 
 tests_require = [
     'pytest',
+    'zope.component [test]',
     ]
 
 setup(name = name,

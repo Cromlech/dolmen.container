@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 
 from persistent import Persistent
+from persistent.list import PersistentList
 from BTrees.OOBTree import OOBTree
 from BTrees.Length import Length
-from dolmen.container.interfaces import IContainer, IBTreeContainer
-from dolmen.container.contained import Contained, setitem, uncontained
 from zope.interface import implements
+
+from dolmen.container.contained import Contained, setitem, uncontained
+from dolmen.container.contained import notifyContainerModified
+from dolmen.container.interfaces import (
+    IContainer, IBTreeContainer, IOrderedContainer)
 
 
 class Lazy(object):
@@ -148,3 +152,52 @@ class BTreeContainer(Container, Persistent):
 
     def values(self, key=None):
         return self._data.values(key)
+
+
+class OrderedBTreeContainer(BTreeContainer):
+
+    implements(IOrderedContainer)
+
+    def __init__(self):
+        super(OrderedBTreeContainer, self).__init__()
+        self._order = PersistentList()
+
+    def keys(self):
+        return self._order[:]
+
+    def values(self):
+        return (self[key] for key in self._order)
+
+    def items(self):
+        return ((key, self[key]) for key in self._order)
+
+    def __setitem__(self, key, object):
+        exists = key in self
+        if not exists:
+            self._order.append(key)
+        try:
+            super(OrderedBTreeContainer, self).__setitem__(key, object)
+        except Exception, e:
+            if not exists:
+                self._order.remove(key)
+            raise e
+        return key
+
+    def __delitem__(self, key):
+        super(OrderedBTreeContainer, self).__delitem__(key)
+        self._order.remove(key)
+
+    def updateOrder(self, order):
+        """Impose a new order on the items in this container.
+
+        Items in this container are, by default, returned in the order
+        in which they were inserted.  To change the order, provide an
+        argument to this method that is a sequence containing every key
+        already in the container, but in a new order.
+        """
+        if set(order) != set(self._order):
+            raise ValueError("Incompatible key set.")
+
+        self._order = PersistentList()
+        self._order.extend(order)
+        notifyContainerModified(self)
