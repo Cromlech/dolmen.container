@@ -55,3 +55,40 @@ def test_checkName():
         checkName('other', object())
         checkName(u'reserved', object())
         checkName(u'other', object())
+
+
+def test_chooseName():
+    container = Container()
+    container['foo.old.rst'] = 'rst doc'
+    nc = NameChooser(container)
+
+    # correct name without changes
+    assert nc.chooseName('foobar.rst', None) == u'foobar.rst'
+    assert nc.chooseName(u'\xe9', None) == u'\xe9'
+
+    # automatically modified named
+    assert nc.chooseName('foo.old.rst', None) == u'foo.old-2.rst'
+    assert nc.chooseName('+@+@foo.old.rst', None) == u'foo.old-2.rst'
+    assert nc.chooseName('+@+@foo/foo+@', None) == u'foo-foo+@'
+
+    # empty name
+    assert nc.chooseName('', None) == u'NoneType'
+    assert nc.chooseName('@+@', []) == u'list'
+
+    # if the name is not a string it is converted
+    assert nc.chooseName(None, None) == u'None'
+    assert nc.chooseName(2, None) == u'2'
+    assert nc.chooseName([], None) == u'[]'
+
+    container['None'] = 'something'
+    assert nc.chooseName(None, None) == u'None-2'
+
+    container['None-2'] = 'something'
+    assert nc.chooseName(None, None) == u'None-3'
+    
+    # even if the given name cannot be converted to unicode
+    class BadBoy:
+        def __unicode__(self):
+            raise Exception
+
+    assert nc.chooseName(BadBoy(), set()) == u'set'
