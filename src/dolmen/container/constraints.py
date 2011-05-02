@@ -142,7 +142,8 @@ import zope.schema
 from zope.dottedname.resolve import resolve
 from zope.interface import providedBy
 from dolmen.container import ZopeMessageFactory as _
-from dolmen.container import IContainer, InvalidItemType, InvalidContainerType
+from dolmen.container.interfaces import (
+    IContainer, InvalidItemType, InvalidContainerType)
 
 
 def checkObject(container, name, object):
