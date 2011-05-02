@@ -126,7 +126,7 @@ def dispatchToSublocations(object, event):
        the objects they are called on and the event objects could be
        different.
 
-       """
+    """
     subs = ISublocations(object, None)
     if subs is not None:
         for sub in subs.sublocations():
@@ -154,8 +154,7 @@ class ContainerSublocations(object):
          >>> sublocations
          [1, 2, 42]
 
-       """
-
+    """
     def __init__(self, container):
         self.container = container
 
@@ -166,115 +165,8 @@ class ContainerSublocations(object):
 
 
 def containedEvent(object, container, name=None):
-    """Establish the containment of the object in the container
-
-    The object and necessary event are returned. The object may be a
-    `ContainedProxy` around the original object. The event is an added
-    event, a moved event, or None.
-
-    If the object implements `IContained`, simply set its `__parent__`
-    and `__name__` attributes:
-
-        >>> container = {}
-        >>> item = Contained()
-        >>> x, event = containedEvent(item, container, u'foo')
-        >>> x is item
-        True
-        >>> item.__parent__ is container
-        True
-        >>> item.__name__
-        u'foo'
-
-    We have an added event:
-
-        >>> event.__class__.__name__
-        'ObjectAddedEvent'
-        >>> event.object is item
-        True
-        >>> event.newParent is container
-        True
-        >>> event.newName
-        u'foo'
-        >>> event.oldParent
-        >>> event.oldName
-
-    Now if we call contained again:
-
-        >>> x2, event = containedEvent(item, container, u'foo')
-        >>> x2 is item
-        True
-        >>> item.__parent__ is container
-        True
-        >>> item.__name__
-        u'foo'
-
-    We don't get a new added event:
-
-        >>> event
-
-    If the object already had a parent but the parent or name was
-    different, we get a moved event:
-
-        >>> x, event = containedEvent(item, container, u'foo2')
-        >>> event.__class__.__name__
-        'ObjectMovedEvent'
-        >>> event.object is item
-        True
-        >>> event.newParent is container
-        True
-        >>> event.newName
-        u'foo2'
-        >>> event.oldParent is container
-        True
-        >>> event.oldName
-        u'foo'
-
-    If the `object` implements `ILocation`, but not `IContained`, set its
-    `__parent__` and `__name__` attributes *and* declare that it
-    implements `IContained`:
-
-        >>> from zope.location import Location
-        >>> item = Location()
-        >>> IContained.providedBy(item)
-        False
-        >>> x, event = containedEvent(item, container, 'foo')
-        >>> x is item
-        True
-        >>> item.__parent__ is container
-        True
-        >>> item.__name__
-        'foo'
-        >>> IContained.providedBy(item)
-        True
-
-
-    If the `object` doesn't even implement `ILocation`, put a
-    `ContainedProxy` around it:
-
-        >>> item = []
-        >>> x, event = containedEvent(item, container, 'foo')
-        >>> x is item
-        False
-        >>> x.__parent__ is container
-        True
-        >>> x.__name__
-        'foo'
-
-    Make sure we don't lose existing directly provided interfaces.
-
-        >>> from zope.interface import Interface, directlyProvides
-        >>> class IOther(Interface):
-        ...     pass
-        >>> from zope.location import Location
-        >>> item = Location()
-        >>> directlyProvides(item, IOther)
-        >>> IOther.providedBy(item)
-        True
-        >>> x, event = containedEvent(item, container, 'foo')
-        >>> IOther.providedBy(item)
-        True
+    """Establish the containment of the object in the container.
     """
-
     if not IContained.providedBy(object):
         if ILocation.providedBy(object):
             zope.interface.alsoProvides(object, IContained)
@@ -298,21 +190,18 @@ def containedEvent(object, container, name=None):
 
     return object, event
 
+
 def contained(object, container, name=None):
-    """Establish the containment of the object in the container
-
-    Just return the contained object without an event. This is a convenience
-    "macro" for:
-
-       ``containedEvent(object, container, name)[0]``
-
-    This function is only used for tests.
+    """Establishes the containment of the object in the container
     """
     return containedEvent(object, container, name)[0]
 
+
 def notifyContainerModified(object, *descriptions):
-    """Notify that the container was modified."""
+    """Notifies that the container was modified.
+    """
     notify(ContainerModifiedEvent(object, *descriptions))
+
 
 def setitem(container, setitemf, name, object):
     """Helper function to set an item and generate needed events
@@ -547,86 +436,6 @@ fixing_up = False
 
 
 def uncontained(object, container, name=None):
-    """Clear the containment relationship between the `object` and
-    the `container`.
-
-    If we run this using the testing framework, we'll use `getEvents` to
-    track the events generated:
-
-    >>> from zope.component.eventtesting import getEvents
-    >>> from zope.lifecycleevent.interfaces import IObjectModifiedEvent
-    >>> from zope.lifecycleevent.interfaces import IObjectRemovedEvent
-
-    We'll start by creating a container with an item:
-
-    >>> class Item(Contained):
-    ...     pass
-
-    >>> item = Item()
-    >>> container = {u'foo': item}
-    >>> x, event = containedEvent(item, container, u'foo')
-    >>> item.__parent__ is container
-    1
-    >>> item.__name__
-    u'foo'
-
-    Now we'll remove the item. It's parent and name are cleared:
-
-    >>> uncontained(item, container, u'foo')
-    >>> item.__parent__
-    >>> item.__name__
-
-    We now have a new removed event:
-
-    >>> len(getEvents(IObjectRemovedEvent))
-    1
-    >>> event = getEvents(IObjectRemovedEvent)[-1]
-    >>> event.object is item
-    1
-    >>> event.oldParent is container
-    1
-    >>> event.oldName
-    u'foo'
-    >>> event.newParent
-    >>> event.newName
-
-    As well as a modification event for the container:
-
-    >>> len(getEvents(IObjectModifiedEvent))
-    1
-    >>> getEvents(IObjectModifiedEvent)[-1].object is container
-    1
-
-    Now if we call uncontained again:
-
-    >>> uncontained(item, container, u'foo')
-
-    We won't get any new events, because __parent__ and __name__ are None:
-
-    >>> len(getEvents(IObjectRemovedEvent))
-    1
-    >>> len(getEvents(IObjectModifiedEvent))
-    1
-
-    But, if either the name or parent are not ``None`` and they are not the
-    container and the old name, we'll get a modified event but not a removed
-    event.
-
-    >>> item.__parent__, item.__name__ = container, None
-    >>> uncontained(item, container, u'foo')
-    >>> len(getEvents(IObjectRemovedEvent))
-    1
-    >>> len(getEvents(IObjectModifiedEvent))
-    2
-
-    >>> item.__parent__, item.__name__ = None, u'bar'
-    >>> uncontained(item, container, u'foo')
-    >>> len(getEvents(IObjectRemovedEvent))
-    1
-    >>> len(getEvents(IObjectModifiedEvent))
-    3
-
-    """
     try:
         oldparent = object.__parent__
         oldname = object.__name__
@@ -660,59 +469,6 @@ class NameChooser(object):
         self.context = context
 
     def checkName(self, name, object):
-        """See dolmen.container.interfaces.INameChooser
-
-        We create and populate a dummy container
-
-        >>> from dolmen.container.components import Container
-        >>> container = ComponentsContainer()
-        >>> container['foo'] = 'bar'
-        >>> from dolmen.container.contained import NameChooser
-
-        An invalid name raises a ValueError:
-
-        >>> NameChooser(container).checkName('+foo', object())
-        Traceback (most recent call last):
-        ...
-        ValueError: Names cannot begin with '+' or '@' or contain '/'
-
-        A name that already exists raises a KeyError:
-
-        >>> NameChooser(container).checkName('foo', object())
-        Traceback (most recent call last):
-        ...
-        KeyError: u'The given name is already being used'
-
-        A name must be a string or unicode string:
-
-        >>> NameChooser(container).checkName(2, object())
-        Traceback (most recent call last):
-        ...
-        TypeError: ('Invalid name type', <type 'int'>)
-
-        A correct name returns True:
-
-        >>> NameChooser(container).checkName('2', object())
-        True
-
-        We can reserve some names by providing a IReservedNames adapter
-        to a container:
-
-        >>> from dolmen.container.interfaces import IContainer
-        >>> class ReservedNames(object):
-        ...     zope.component.adapts(IContainer)
-        ...     implements(IReservedNames)
-        ...
-        ...     def __init__(self, context):
-        ...         self.reservedNames = set(('reserved', 'other'))
-
-        >>> zope.component.getSiteManager().registerAdapter(ReservedNames)
-
-        >>> NameChooser(container).checkName('reserved', None)
-        Traceback (most recent call last):
-        ...
-        NameReserved: reserved
-        """
 
         if isinstance(name, str):
             name = unicode(name)
@@ -721,13 +477,11 @@ class NameChooser(object):
 
         if not name:
             raise ValueError(
-                _("An empty name was provided. Names cannot be empty.")
-                )
+                _("An empty name was provided. Names cannot be empty."))
 
         if name[:1] in '+@' or '/' in name:
             raise ValueError(
-                _("Names cannot begin with '+' or '@' or contain '/'")
-                )
+                _("Names cannot begin with '+' or '@' or contain '/'"))
 
         reserved = IReservedNames(self.context, None)
         if reserved is not None:
@@ -736,46 +490,12 @@ class NameChooser(object):
 
         if name in self.context:
             raise KeyError(
-                _("The given name is already being used")
-                )
+                _("The given name is already being used"))
 
         return True
 
 
     def chooseName(self, name, object):
-        """See dolmen.container.interfaces.INameChooser
-
-        The name chooser is expected to choose a name without error
-
-        We create and populate a dummy container
-
-        >>> from dolmen.container.components import Container
-        >>> container = Container()
-        >>> container['foobar.old'] = 'rst doc'
-
-        >>> from dolmen.container.contained import NameChooser
-
-        the suggested name is converted to unicode:
-
-        >>> NameChooser(container).chooseName('foobar', object())
-        u'foobar'
-
-        If it already exists, a number is appended but keeps the same extension:
-
-        >>> NameChooser(container).chooseName('foobar.old', object())
-        u'foobar-2.old'
-
-        Bad characters are turned into dashes:
-
-        >>> NameChooser(container).chooseName('foo/foo', object())
-        u'foo-foo'
-
-        If no name is suggested, it is based on the object type:
-
-        >>> NameChooser(container).chooseName('', [])
-        u'list'
-
-        """
 
         container = self.context
 
