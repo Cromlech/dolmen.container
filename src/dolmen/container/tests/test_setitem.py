@@ -13,9 +13,7 @@ from zope.location import Location
 from zope.location.interfaces import IContained
 from zope.interface import Interface, implements
 from zope.testing.cleanup import cleanUp
-from zope.component.eventtesting import getEvents, clearEvents
-from zope.component.testing import PlacelessSetup as CAPlacelessSetup
-from zope.component.eventtesting import PlacelessSetup as EventPlacelessSetup
+from zope.component.eventtesting import setUp, getEvents, clearEvents
 from zope.lifecycleevent.interfaces import (
     IObjectAddedEvent, IObjectMovedEvent, IObjectModifiedEvent)
 
@@ -37,18 +35,21 @@ class Item(Contained):
         self.moved = event
 
 
-def setup_module(module):
-    CAPlacelessSetup().setUp()
-    EventPlacelessSetup().setUp()
+def added(obj, event):
+    obj.setAdded(event)
 
-    zope.component.provideHandler(
-        lambda obj, event: obj.setAdded(event), [IItem, IObjectAddedEvent])
-    zope.component.provideHandler(
-        lambda obj, event: obj.setMoved(event), [IItem, IObjectMovedEvent])
+
+def moved(obj, event):
+    obj.setMoved(event)
+
+
+def setup_module(module):
+    setUp()
+    zope.component.provideHandler(added, [IItem, IObjectAddedEvent])
+    zope.component.provideHandler(moved, [IItem, IObjectMovedEvent])
 
 
 def teardown_module(module):
-    clearEvents()
     cleanUp()
 
 
@@ -97,17 +98,17 @@ def test_no_event():
     setitem(container, container.__setitem__, u'c', item)
 
     assert len(container) == 1
-    assert len(getEvents(IObjectAddedEvent)) == 1
-    assert len(getEvents(IObjectModifiedEvent)) == 1
+    assert len(getEvents(IObjectAddedEvent)) == 0
+    assert len(getEvents(IObjectModifiedEvent)) == 0
 
     assert getattr(item, 'added', None) is None
     assert getattr(item, 'moved', None) is None
 
     # we clean our test.
-    clearEvents
+    clearEvents()
 
 
-def test_nove_event():
+def test_move_event():
     """If the item had a parent or name (as in a move or rename),
     we generate a move event, rather than an add event.
     """
@@ -117,26 +118,27 @@ def test_nove_event():
     item = Item()
     setitem(container, container.__setitem__, u'c1', item)
 
+    # Add operation are "moved" events.
+    assert len(getEvents(IObjectMovedEvent)) == 1
+
     # We created an item already contained.
     item = Item()
     item.__parent__, item.__name__ = container, 'c2'
     setitem(container, container.__setitem__, u'c2', item)
 
     assert len(container) == 2
-    assert len(getEvents(IObjectAddedEvent)) == 2
-    assert len(getEvents(IObjectModifiedEvent)) == 2
-
-    # We have 2 move events because add are move events.
-    assert len(getEvents(IObjectMovedEvent)) == 2
+    assert len(getEvents(IObjectAddedEvent)) == 1
+    assert len(getEvents(IObjectModifiedEvent)) == 1
+    assert len(getEvents(IObjectMovedEvent)) == 1
 
     # We now rewrite 'c2' under another name
     # Thus, we created a move event : +1 modification +1 move.
     setitem(container, container.__setitem__, u'c3', item)
 
     assert len(container) == 3
-    assert len(getEvents(IObjectAddedEvent)) == 2
-    assert len(getEvents(IObjectModifiedEvent)) == 3
-    assert len(getEvents(IObjectMovedEvent)) == 3
+    assert len(getEvents(IObjectAddedEvent)) == 1
+    assert len(getEvents(IObjectModifiedEvent)) == 2
+    assert len(getEvents(IObjectMovedEvent)) == 2
 
     # We also get the move hook called, but not the add hook:
     event = getEvents(IObjectMovedEvent)[-1]
@@ -170,7 +172,7 @@ def test_replace():
 
     # we clean our test.
     clearEvents()
-
+    
 
 def test_interface_providing():
     """If the object implements `ILocation`, but not `IContained`, set it's
