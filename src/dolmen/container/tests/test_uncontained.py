@@ -3,8 +3,6 @@
 the `container`.
 """
 
-import pytest
-import zope.component
 from dolmen.container.contained import Contained, containedEvent, uncontained
 from zope.lifecycleevent.interfaces import IObjectModifiedEvent
 from zope.lifecycleevent.interfaces import IObjectRemovedEvent
@@ -15,8 +13,8 @@ from zope.component.eventtesting import PlacelessSetup as EventPlacelessSetup
 
 
 def setup_module(module):
-    ca = CAPlacelessSetup().setUp()
-    event = EventPlacelessSetup().setUp()
+    CAPlacelessSetup().setUp()
+    EventPlacelessSetup().setUp()
 
 
 def teardown_module(module):
@@ -32,7 +30,7 @@ def test_uncontained():
     item = Item()
     container = {u'foo': item}
     x, event = containedEvent(item, container, u'foo')
-    
+
     assert item.__parent__ is container
     assert item.__name__ == u'foo'
 
@@ -40,7 +38,6 @@ def test_uncontained():
     assert item.__parent__ is None
     assert item.__name__ is None
 
- 
     assert len(getEvents(IObjectRemovedEvent)) == 1
 
     event = getEvents(IObjectRemovedEvent)[-1]

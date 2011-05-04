@@ -3,10 +3,10 @@
 import pytest
 import zope.component
 import zope.interface
-from zope.location.interfaces import IContained
 from dolmen.container.components import Container
 from dolmen.container.interfaces import IContainer
-from dolmen.container.contained import NameChooser, NameReserved, IReservedNames
+from dolmen.container.contained import (
+    NameChooser, NameReserved, IReservedNames)
 
 
 def test_checkName():
@@ -20,26 +20,26 @@ def test_checkName():
         checkName([], object())
         checkName(None, object())
         checkName(None, None)
-    
+
     # invalid names
     with pytest.raises(ValueError):
         checkName('+foo', object())
         checkName('@foo', object())
         checkName('f/oo', object())
         checkName('', object())
-    
+
     # existing names
     with pytest.raises(KeyError):
         checkName('foo', object())
         checkName(u'foo', object())
-    
+
     # correct names
     assert checkName('2', object())
     assert checkName(u'2', object())
     assert checkName('other', object())
     assert checkName(u'reserved', object())
     assert checkName(u'r\xe9served', object())
-    
+
     # reserved names
     class ReservedNames(object):
         zope.component.adapts(IContainer)
@@ -85,7 +85,7 @@ def test_chooseName():
 
     container['None-2'] = 'something'
     assert nc.chooseName(None, None) == u'None-3'
-    
+
     # even if the given name cannot be converted to unicode
     class BadBoy:
         def __unicode__(self):

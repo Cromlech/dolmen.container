@@ -4,7 +4,6 @@ from dolmen.container import ZopeMessageFactory as _
 from zope.interface import Interface, Invalid
 from zope.interface.common.mapping import IItemMapping
 from zope.interface.common.mapping import IReadMapping, IEnumerableMapping
-from zope.location.interfaces import ILocation
 from zope.schema import Set
 from zope.lifecycleevent.interfaces import IObjectModifiedEvent
 
@@ -113,19 +112,23 @@ class IWriteContainer(Interface):
 
 
 class IItemWriteContainer(IWriteContainer, IItemContainer):
-    """A write container that also supports minimal reads."""
+    """A write container that also supports minimal reads.
+    """
 
 
 class IContainer(IReadContainer, IWriteContainer):
-    """Readable and writable content container."""
+    """Readable and writable content container.
+    """
 
 
 class IContentContainer(IContainer):
-    """A container that is to be used as a content type."""
+    """A container that is to be used as a content type.
+    """
 
 
 class IBTreeContainer(IContainer):
-    """Container that supports BTree semantics for some methods."""
+    """Container that supports BTree semantics for some methods.
+    """
 
     def items(key=None):
         """Return an iterator over the key-value pairs in the container.
@@ -162,8 +165,8 @@ class IBTreeContainer(IContainer):
 
 
 class IOrdered(Interface):
-    """Objects whose contents are maintained in order."""
-
+    """Objects whose contents are maintained in order.
+    """
 
     def updateOrder(order):
         """Revise the order of keys, replacing the current ordering.

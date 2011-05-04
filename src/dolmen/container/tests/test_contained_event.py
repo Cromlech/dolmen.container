@@ -1,21 +1,17 @@
 # -*- coding: utf-8 -*-
 
-import pytest
-import zope.component
 from zope.location import Location
 from zope.location.interfaces import IContained
-from dolmen.container.contained import Contained, containedEvent, uncontained
-from zope.lifecycleevent.interfaces import IObjectModifiedEvent
-from zope.lifecycleevent.interfaces import IObjectRemovedEvent
+from dolmen.container.contained import Contained, containedEvent
 from zope.testing.cleanup import cleanUp
-from zope.component.eventtesting import getEvents, clearEvents
+from zope.component.eventtesting import clearEvents
 from zope.component.testing import PlacelessSetup as CAPlacelessSetup
 from zope.component.eventtesting import PlacelessSetup as EventPlacelessSetup
 
 
 def setup_module(module):
-    ca = CAPlacelessSetup().setUp()
-    event = EventPlacelessSetup().setUp()
+    CAPlacelessSetup().setUp()
+    EventPlacelessSetup().setUp()
 
 
 def teardown_module(module):
@@ -49,7 +45,7 @@ def test_contained_event():
 
     # Moved event
     x, event = containedEvent(item, container, u'foo2')
-    assert event.__class__.__name__ ==  'ObjectMovedEvent'
+    assert event.__class__.__name__ == 'ObjectMovedEvent'
     assert event.object is item
     assert event.newParent is container
     assert event.newName == u'foo2'
@@ -78,7 +74,7 @@ def test_contained_event():
 
     class IOther(Interface):
         pass
- 
+
     item = Location()
     directlyProvides(item, IOther)
     assert IOther.providedBy(item)

@@ -4,7 +4,7 @@
 Containment constraints allow us to express restrictions on the types
 of items that can be placed in containers or on the types of
 containers an item can be placed in.  We express these constraints in
-interfaces. 
+interfaces.
 """
 
 import pytest
@@ -33,7 +33,7 @@ class IBuddy(IContained):
 
 
 def test_contraints():
-    
+
     class Buddy:
         interface.implements(IBuddy)
 
@@ -96,4 +96,4 @@ def test_moving_failure():
     subcontainer.__parent__ = container
 
     with pytest.raises(TypeError):
-      checkObject(subcontainer, 'x', container)
+        checkObject(subcontainer, 'x', container)

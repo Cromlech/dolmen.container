@@ -178,12 +178,11 @@ def checkObject(container, name, object):
         else:
             validate(container)
 
-
     if not containerProvided.extends(IContainer):
         # If it doesn't implement IContainer, it can't contain stuff.
         raise TypeError(
-            _('Container is not a valid Zope container.')
-            )
+            _('Container is not a valid Zope container.'))
+
 
 def checkFactory(container, name, factory):
     __setitem__ = providedBy(container).get('__setitem__')
@@ -327,7 +326,7 @@ class ItemTypePrecondition(_TypesBased):
 
         for iface in self.types:
             if implemented.isOrExtends(iface):
-               return
+                return
         raise InvalidItemType(container, factory, self.types)
 
 
@@ -363,17 +362,15 @@ def contains(*types):
 
     if not (f_locals is not f_globals
             and f_locals.get('__module__')
-            and f_locals.get('__module__') == f_globals.get('__name__')
-            ):
+            and f_locals.get('__module__') == f_globals.get('__name__')):
         raise TypeError("contains not called from suite")
 
     def __setitem__(key, value):
         pass
+
     __setitem__.__doc__ = IContainer['__setitem__'].__doc__
     __setitem__.precondition = ItemTypePrecondition(
-        *types,
-        **dict(module=f_globals['__name__'])
-        )
+        *types, **dict(module=f_globals['__name__']))
     f_locals['__setitem__'] = __setitem__
 
 
@@ -415,11 +412,11 @@ class ContainerTypesConstraint(_TypesBased):
     zope.interface.implements(IContainerTypesConstraint)
 
     def __call__(self, object):
-       for iface in self.types:
-           if iface.providedBy(object):
-               return True
-       else:
-           raise InvalidContainerType(object, self.types)
+        for iface in self.types:
+            if iface.providedBy(object):
+                return True
+        else:
+            raise InvalidContainerType(object, self.types)
 
 
 def containers(*types):
@@ -456,14 +453,10 @@ def containers(*types):
 
     if not (f_locals is not f_globals
             and f_locals.get('__module__')
-            and f_locals.get('__module__') == f_globals.get('__name__')
-            ):
+            and f_locals.get('__module__') == f_globals.get('__name__')):
         raise TypeError("containers not called from suite")
 
     __parent__ = zope.schema.Field(
-        constraint = ContainerTypesConstraint(
-            *types,
-            **dict(module=f_globals['__name__'])
-            )
-        )
+        constraint=ContainerTypesConstraint(
+            *types, **dict(module=f_globals['__name__'])))
     f_locals['__parent__'] = __parent__

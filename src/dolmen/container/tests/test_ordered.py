@@ -12,8 +12,8 @@ from zope.lifecycleevent.interfaces import (
 
 
 def setup_module(module):
-    ca = CAPlacelessSetup().setUp()
-    event = EventPlacelessSetup().setUp()
+    CAPlacelessSetup().setUp()
+    EventPlacelessSetup().setUp()
 
 
 def teardown_module(module):
@@ -66,5 +66,5 @@ def test_exception_causes_order_fix():
     oc = OrderedBTreeContainer()
     with pytest.raises(RuntimeError):
         oc['foo'] = 'FOO'
- 
+
     assert not 'foo' in oc.keys()

@@ -1,21 +1,16 @@
 # -*- coding: utf-8 -*-
 
 import zope.component
-import zope.interface.declarations
 
 from zope.broken.interfaces import IBroken
-from zope.interface import providedBy, implements
-from zope.interface.declarations import getObjectSpecification
-from zope.interface.declarations import ObjectSpecification
+from zope.interface import implements
 from zope.event import notify
 from zope.location.interfaces import IContained, ILocation, ISublocations
-from zope.security.checker import selectChecker, CombinedChecker
 from zope.lifecycleevent import (
     ObjectModifiedEvent, ObjectMovedEvent,
     ObjectAddedEvent, ObjectRemovedEvent)
 
 from zope.location import LocationProxy
-from zope.proxy import getProxiedObject
 from dolmen.container import ZopeMessageFactory as _
 from dolmen.container.interfaces import (
     INameChooser, IReservedNames, NameReserved, IContainerModifiedEvent)
@@ -49,7 +44,7 @@ def dispatchToSublocations(object, event):
     if subs is not None:
         for sub in subs.sublocations():
             for ignored in zope.component.subscribers((sub, event), None):
-                pass # They do work in the adapter fetch
+                pass  # They do work in the adapter fetch
 
 
 class ContainerSublocations(object):
@@ -198,12 +193,11 @@ class NameChooser(object):
 
         return True
 
-
     def chooseName(self, name, object):
 
         container = self.context
 
-        # convert to unicode and remove characters that checkName does not allow
+        # convert to unicode and remove checkName unallowed characters
         try:
             name = unicode(name)
         except:

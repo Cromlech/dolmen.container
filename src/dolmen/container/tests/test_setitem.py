@@ -29,17 +29,17 @@ class IItem(Interface):
 
 class Item(Contained):
     implements(IItem)
-    
+
     def setAdded(self, event):
         self.added = event
 
     def setMoved(self, event):
-         self.moved = event
+        self.moved = event
 
 
 def setup_module(module):
-    ca = CAPlacelessSetup().setUp()
-    event = EventPlacelessSetup().setUp()
+    CAPlacelessSetup().setUp()
+    EventPlacelessSetup().setUp()
 
     zope.component.provideHandler(
         lambda obj, event: obj.setAdded(event), [IItem, IObjectAddedEvent])
@@ -53,14 +53,14 @@ def teardown_module(module):
 
 
 def test_setitem():
-    
+
     item = Item()
     container = {}
-    
+
     setitem(container, container.__setitem__, u'c', item)
     assert container[u'c'] is item
     assert item.__parent__ is container
-    assert item.__name__ ==  u'c'
+    assert item.__name__ == u'c'
 
     # We should get events
     assert len(getEvents(IObjectAddedEvent)) == 1
@@ -81,7 +81,7 @@ def test_setitem():
     assert item.moved is event
 
     # we clean our test.
-    clearEvents          
+    clearEvents()
 
 
 def test_no_event():
@@ -145,7 +145,7 @@ def test_nove_event():
 
     # we clean our test.
     clearEvents()
-    
+
 
 def test_replace():
     """If we try to replace an item without deleting it first, we'll get
@@ -178,7 +178,7 @@ def test_interface_providing():
     implements `IContained`.
     """
     container = {}
-    
+
     item = Location()
     assert not IContained.providedBy(item)
 
@@ -194,7 +194,6 @@ def test_interface_providing():
 
     # If the object doesn't even implement `ILocation`, put a
     # `ContainedProxy` around it:
-
     item = []
     setitem(container, container.__setitem__, u'i', item)
     assert container[u'i'] == []
@@ -203,14 +202,14 @@ def test_interface_providing():
     item = container[u'i']
     assert item.__parent__ is container
     assert item.__name__ == u'i'
-    
+
     assert IContained.providedBy(item)
     assert len(getEvents(IObjectAddedEvent)) == 2
     assert len(getEvents(IObjectModifiedEvent)) == 2
 
     # we clean our test.
     clearEvents()
-    
+
 
 def test_key_integrity():
     """We'll get type errors if we give keys that aren't
@@ -227,4 +226,3 @@ def test_key_integrity():
     with pytest.raises(ValueError):
         setitem(container, container.__setitem__, '', item)
         setitem(container, container.__setitem__, u'', item)
-

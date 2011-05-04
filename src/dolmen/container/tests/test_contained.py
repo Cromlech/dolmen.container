@@ -2,19 +2,11 @@
 
 import pickle
 import pytest
-import transaction
 import zope.interface
-import zope.component
 
-from ZODB.DemoStorage import DemoStorage
-from ZODB.DB import DB
 from persistent import Persistent
-from persistent.interfaces import IPersistent
 from zope.location.interfaces import ILocation, IContained
-
-from dolmen.container.contained import ContainedProxy, NameChooser
-from dolmen.container.components import Container
-from dolmen.container.interfaces import NameReserved, IContainer, IReservedNames
+from dolmen.container.contained import ContainedProxy
 
 
 class MyOb(Persistent):
@@ -39,7 +31,7 @@ def test_basic_proxy_attribute_management_and_picklability():
 
     with pytest.raises(TypeError):
         # A proxy is not pickable.
-        p2 = pickle.loads(pickle.dumps(p))
+        pickle.loads(pickle.dumps(p))
 
 
 def test_declarations_on_ContainedProxy():
@@ -68,7 +60,7 @@ def test_declarations_on_ContainedProxy():
         pass
 
     zope.interface.directlyProvides(c, I2)
-    
+
     assert tuple(zope.interface.providedBy(p)) == (
       (I2, I1, IContained, ILocation))
 
@@ -78,7 +70,7 @@ def test_declarations_on_ContainedProxy():
 
     zope.interface.directlyProvides(p, I3)
 
-    assert tuple(zope.interface.providedBy(p)) == ( 
+    assert tuple(zope.interface.providedBy(p)) == (
       (I3, I1, IContained, ILocation))
 
 

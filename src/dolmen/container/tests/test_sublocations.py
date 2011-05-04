@@ -21,7 +21,7 @@ class MyContainer(object):
 
 def test_sublocations():
     assert verifyClass(ISublocations, ContainerSublocations)
-    
+
     container = MyContainer(x=1, y=2, z=42)
     adapter = ContainerSublocations(container)
     assert verifyObject(ISublocations, adapter)

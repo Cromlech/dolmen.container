@@ -26,11 +26,13 @@ def test_keys():
     container = Container()
     keys = container.keys()
     assert list(keys) == []
-    
+
     container = make_container()
     keys = container.keys()
-    keys = list(keys); keys.sort()  # convert to sorted list
-    ikeys = [k for k, v in DATA]; ikeys.sort()  # sort input keys
+    keys = list(keys)
+    keys.sort()  # convert to sorted list
+    ikeys = [k for k, v in DATA]
+    ikeys.sort()  # sort input keys
     assert keys == ikeys
 
 
@@ -43,7 +45,7 @@ def test_get():
         container.__getitem__(DATA[0][0])
 
     assert container.get(DATA[0][0], default) is default
-    
+
     container = make_container()
     with pytest.raises(KeyError):
         container.__getitem__("cromlech")
@@ -69,9 +71,9 @@ def test_values():
             values.remove(v)
         except ValueError:
             raise KeyError('Value not in list')
-            
+
     assert values == []
-            
+
 
 def test_len():
     # See interface IReadContainer
@@ -90,8 +92,10 @@ def test_items():
 
     container = make_container()
     items = container.items()
-    items = list(items); items.sort()  # convert to sorted list
-    data = [(k, v) for k, v in DATA]; data.sort()
+    items = list(items)
+    items.sort()  # convert to sorted list
+    data = [(k, v) for k, v in DATA]
+    data.sort()
     assert items == data
 
 
@@ -113,11 +117,11 @@ def test_delObject():
 
     with pytest.raises(KeyError):
         container.__delitem__(DATA[0][0])
-    
+
     container = make_container()
     with pytest.raises(KeyError):
         container.__delitem__("cromlech")
-  
+
     for i in (1, 8, 7, 3, 4):
         del container[DATA[i][0]]
 

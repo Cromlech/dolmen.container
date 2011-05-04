@@ -2,8 +2,6 @@
 """BTree Container Tests
 """
 from pytest import raises
-from doctest import DocTestSuite
-from unittest import TestCase, main, makeSuite, TestSuite
 from zope.interface.verify import verifyObject
 from dolmen.container.components import BTreeContainer
 from dolmen.container.interfaces import IBTreeContainer
@@ -33,7 +31,7 @@ def test_stored_length():
 
     assert bc.__dict__['_BTreeContainer__len']() == 0
     del bc.__dict__['_BTreeContainer__len']
-    assert not bc.__dict__.has_key('_BTreeContainer__len')
+    assert not '_BTreeContainer__len' in bc.__dict__
 
     bc['1'] = 1
     assert len(bc) == 1

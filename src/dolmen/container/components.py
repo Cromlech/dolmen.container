@@ -133,7 +133,7 @@ class BTreeContainer(Container, Persistent):
         l = self.__len
         self._data[key] = value
         l.change(1)
-       
+
     def __setitem__(self, key, value):
         setitem(self, self._setitemf, key, value)
 
