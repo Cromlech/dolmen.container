@@ -1,6 +1,5 @@
 dolmen.container
 ****************
 
-This package extends the `cromlech.container` components. Two components
-are available : `Container` and two ZODB-aware BTree containers :
-`BTreeContainer` and `OrderedBTreeContainer`.
+This package extends the `cromlech.container` components. Two ZODB-aware
+BTree containers are available : `BTreeContainer` and `OrderedBTreeContainer`.
