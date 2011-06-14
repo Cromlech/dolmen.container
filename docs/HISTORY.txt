@@ -1,7 +1,13 @@
 Changes
 =======
 
+0.2 (2011-06-14)
+----------------
+
+* Forked non-persistent components and utilities to `cromlech.container`.
+
+
 0.1 (2011-05-04)
-================
+----------------
 
 * Initial fork from `zope.container`.
