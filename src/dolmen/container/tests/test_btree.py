@@ -7,16 +7,20 @@ from dolmen.container.components import BTreeContainer
 from dolmen.container.interfaces import IBTreeContainer
 
 
+import sys
+if sys.version > '3':
+    unicode = str
+
+
 def checkIterable(iterable):
     it = iter(iterable)
-    assert callable(it.next)
     assert callable(it.__iter__)
     assert iter(it) is it
 
     # Exhaust the iterator:
     first_time = list(it)
     with raises(StopIteration):
-        it.next()
+        next(it)
 
     # Subsequent iterations will return the same values:
     assert list(iterable) == first_time

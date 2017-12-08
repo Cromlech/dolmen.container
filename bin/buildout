@@ -1,20 +1,12 @@
-#!/usr/bin/python -S
+#!/home/trollfot/projects/sandbox/dolmen.container/bin/python
 
 import sys
 sys.path[0:0] = [
-    '/home/trollfot/projects/sandbox/dolmen.container/parts/buildout',
-    ]
-
-
-import os
-path = sys.path[0]
-if os.environ.get('PYTHONPATH'):
-    path = os.pathsep.join([path, os.environ['PYTHONPATH']])
-os.environ['BUILDOUT_ORIGINAL_PYTHONPATH'] = os.environ.get('PYTHONPATH', '')
-os.environ['PYTHONPATH'] = path
-import site # imports custom buildout-generated site.py
+  '/home/trollfot/projects/sandbox/dolmen.container/eggs/zc.buildout-2.10.0-py3.5.egg',
+  '/home/trollfot/projects/sandbox/dolmen.container/lib/python3.5/site-packages',
+  ]
 
 import zc.buildout.buildout
 
 if __name__ == '__main__':
-    zc.buildout.buildout.main()
+    sys.exit(zc.buildout.buildout.main())

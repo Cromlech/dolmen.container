@@ -4,7 +4,7 @@ from setuptools import setup, find_packages, Extension
 from os.path import join
 
 name = 'dolmen.container'
-version = '0.2'
+version = '0.3a1'
 readme = open(join('src', 'dolmen', 'container', "README.txt")).read()
 history = open(join('docs', 'HISTORY.txt')).read()
 

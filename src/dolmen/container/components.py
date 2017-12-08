@@ -4,7 +4,7 @@ from persistent import Persistent
 from persistent.list import PersistentList
 from BTrees.OOBTree import OOBTree
 from BTrees.Length import Length
-from zope.interface import implements
+from zope.interface import implementer
 
 from cromlech.container.components import Container, Lazy
 from cromlech.container.contained import setitem, uncontained
@@ -13,10 +13,10 @@ from cromlech.container.interfaces import IOrderedContainer
 from dolmen.container.interfaces import IBTreeContainer
 
 
+@implementer(IBTreeContainer)
 class BTreeContainer(Container, Persistent):
     """Persistent container, using ZODB BTree.
     """
-    implements(IBTreeContainer)
 
     def __init__(self):
         Container.__init__(self)
@@ -65,9 +65,8 @@ class BTreeContainer(Container, Persistent):
         return self._data.values(key)
 
 
+@implementer(IOrderedContainer)
 class OrderedBTreeContainer(BTreeContainer):
-
-    implements(IOrderedContainer)
 
     def __init__(self):
         super(OrderedBTreeContainer, self).__init__()
@@ -88,7 +87,7 @@ class OrderedBTreeContainer(BTreeContainer):
             self._order.append(key)
         try:
             super(OrderedBTreeContainer, self).__setitem__(key, object)
-        except Exception, e:
+        except Exception as e:
             if not exists:
                 self._order.remove(key)
             raise e
