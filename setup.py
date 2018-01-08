@@ -4,23 +4,22 @@ from setuptools import setup, find_packages, Extension
 from os.path import join
 
 name = 'dolmen.container'
-version = '0.3a1'
+version = '0.4'
 readme = open(join('src', 'dolmen', 'container', "README.txt")).read()
 history = open(join('docs', 'HISTORY.txt')).read()
 
 install_requires = [
-    'ZODB3 >= 3.10',
+    'ZODB >= 4',
     'setuptools',
     'zope.interface',
     'cromlech.container',
+    'persistent >= 4.2',
+    'BTrees >= 4.4'
     ]
 
 tests_require = [
     'pytest',
-    'zope.testing',
-    'zope.component',
     'zope.lifecycleevent',
-    'zope.component [test]',
     ]
 
 setup(name=name,

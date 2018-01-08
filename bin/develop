@@ -1,10 +1,10 @@
-#!/home/trollfot/projects/sandbox/dolmen.container/bin/python
+#!/usr/bin/python
 
 import sys
 sys.path[0:0] = [
-  '/home/trollfot/projects/sandbox/dolmen.container/lib/python3.5/site-packages',
-  '/home/trollfot/projects/sandbox/dolmen.container/eggs/mr.developer-1.38-py3.5.egg',
-  '/home/trollfot/projects/sandbox/dolmen.container/eggs/zc.buildout-2.10.0-py3.5.egg',
+  '/home/trollfot/projects/devel/Demo/checkouts/dolmen.container/eggs/mr.developer-1.38-py2.7.egg',
+  '/home/trollfot/projects/devel/Demo/checkouts/dolmen.container/eggs/zc.buildout-2.10.0-py2.7.egg',
+  '/usr/lib/python2.7/dist-packages',
   ]
 
 import mr.developer.develop

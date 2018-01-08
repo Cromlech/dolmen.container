@@ -1,24 +1,26 @@
 # -*- coding: utf-8 -*-
 
 import pytest
-import zope.component
-from zope.testing.cleanup import cleanUp
 from dolmen.container.components import OrderedBTreeContainer
-from zope.component.eventtesting import getEvents, clearEvents
-from zope.component.testing import PlacelessSetup as CAPlacelessSetup
-from zope.component.eventtesting import PlacelessSetup as EventPlacelessSetup
-from zope.lifecycleevent.interfaces import (
-    IObjectAddedEvent, IObjectModifiedEvent)
+from zope.event import subscribers as event_subscribers
+from zope.lifecycleevent.interfaces import IObjectAddedEvent
+from zope.lifecycleevent.interfaces import IObjectModifiedEvent
+from zope.lifecycleevent import ObjectAddedEvent
+from cromlech.container.contained import ContainerModifiedEvent
+
+
+events = []
+
+def getEvents(event_type=None, filter=None):
+    return events
+
+
+def clearEvents():
+    del events[:]
 
 
 def setup_module(module):
-    CAPlacelessSetup().setUp()
-    EventPlacelessSetup().setUp()
-
-
-def teardown_module(module):
-    clearEvents()
-    cleanUp()
+    event_subscribers.append(events.append)
 
 
 def test_order_events():
@@ -39,32 +41,15 @@ def test_order_events():
         ['ContainerModifiedEvent'])
 
     assert IObjectModifiedEvent.providedBy(events[0])
-
+    clearEvents()
+    
 
 def test_all_items_available_at_object_added_event():
 
-    keys = {}
-
-    @zope.component.adapter(IObjectAddedEvent)
-    def containerKeys(event):
-        keys[event.object] = event.newParent.keys()
-
-    zope.component.provideHandler(containerKeys)
     oc = OrderedBTreeContainer()
     oc['foo'] = 'FOO'
-    assert keys['FOO'] == oc.keys() == ['foo']
 
-
-def test_exception_causes_order_fix():
-
-    @zope.component.adapter(IObjectAddedEvent)
-    def raiseException(event):
-        raise RuntimeError()
-
-    zope.component.provideHandler(raiseException)
-
-    oc = OrderedBTreeContainer()
-    with pytest.raises(RuntimeError):
-        oc['foo'] = 'FOO'
-
-    assert not 'foo' in oc.keys()
+    events = getEvents()
+    assert isinstance(events[0], ObjectAddedEvent)
+    assert isinstance(events[1], ContainerModifiedEvent)    
+    assert events[0].newParent.keys() == oc.keys() == ['foo']
