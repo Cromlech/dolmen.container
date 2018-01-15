@@ -4,24 +4,28 @@ from setuptools import setup, find_packages, Extension
 from os.path import join
 
 name = 'dolmen.container'
-version = '0.3a1'
+version = '0.4+crom'
+
 readme = open(join('src', 'dolmen', 'container', "README.txt")).read()
 history = open(join('docs', 'HISTORY.txt')).read()
 
+
 install_requires = [
-    'ZODB3 >= 3.10',
+    'BTrees',
+    'ZODB >= 5',
+    'cromlech.container',
+    'persistent',
     'setuptools',
     'zope.interface',
-    'cromlech.container',
     ]
 
 tests_require = [
+    'crom',
     'pytest',
-    'zope.testing',
-    'zope.component',
+    'cromlech.events',
     'zope.lifecycleevent',
-    'zope.component [test]',
     ]
+
 
 setup(name=name,
       version=version,
@@ -29,7 +33,7 @@ setup(name=name,
       long_description=readme + '\n\n' + history,
       keywords='Dolmen container implementation, using ZODB BTrees.',
       author='The Dolmen team',
-      author_email='dolmen@list.dolmen-project.org',
+      author_email='sch@treegital.fr',
       url='',
       license='ZPL',
       classifiers=[

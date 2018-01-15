@@ -1,0 +1,21 @@
+dist: trusty
+language: python
+# with next we get on container based infrastructure, this enables caching
+sudo: false
+python:
+  - 3.4
+  - 3.5
+  - 3.6
+
+cache:
+  pip: true
+
+before_install:
+  - pip install --upgrade pip setuptools zc.buildout
+
+install:
+  - python bootstrap.py
+  - bin/buildout
+
+script:
+  - bin/pytest

@@ -1,27 +1,29 @@
 # -*- coding: utf-8 -*-
 
 import pytest
-import zope.component
-from zope.testing.cleanup import cleanUp
+from crom import testing
+
+import crom
+import cromlech.events
+from cromlech.events import setup_dispatcher, teardown_dispatcher
 from dolmen.container.components import OrderedBTreeContainer
-from zope.component.eventtesting import getEvents, clearEvents
-from zope.component.testing import PlacelessSetup as CAPlacelessSetup
-from zope.component.eventtesting import PlacelessSetup as EventPlacelessSetup
-from zope.lifecycleevent.interfaces import (
-    IObjectAddedEvent, IObjectModifiedEvent)
+from zope.lifecycleevent.interfaces import IObjectAddedEvent
+from zope.lifecycleevent.interfaces import IObjectModifiedEvent
+from zope.interface import Interface
 
 
 def setup_module(module):
-    CAPlacelessSetup().setUp()
-    EventPlacelessSetup().setUp()
+    testing.setup()
+    crom.configure(cromlech.events)
+    setup_dispatcher()
 
 
 def teardown_module(module):
-    clearEvents()
-    cleanUp()
+    testing.teardown()
+    teardown_dispatcher()
 
 
-def test_order_events():
+def test_order_events(events):
     oc = OrderedBTreeContainer()
 
     oc['foo'] = 'bar'
@@ -30,26 +32,27 @@ def test_order_events():
 
     assert oc.keys() == ['foo', 'baz', 'zork']
 
-    clearEvents()
+    events.clear()
     oc.updateOrder(['baz', 'foo', 'zork'])
     assert oc.keys() == ['baz', 'foo', 'zork']
 
-    events = getEvents()
-    assert [event.__class__.__name__ for event in events] == (
-        ['ContainerModifiedEvent'])
+    assert [event.__class__.__name__ for event in events] == [
+        'ContainerModifiedEvent',
+    ]
 
-    assert IObjectModifiedEvent.providedBy(events[0])
+    assert IObjectModifiedEvent.providedBy(events.pop())
 
 
 def test_all_items_available_at_object_added_event():
 
     keys = {}
 
-    @zope.component.adapter(IObjectAddedEvent)
-    def containerKeys(event):
-        keys[event.object] = event.newParent.keys()
+    def containerKeys(obj, event):
+        keys[obj] = event.newParent.keys()
 
-    zope.component.provideHandler(containerKeys)
+    crom.implicit.registry.subscribe(
+        (Interface, IObjectAddedEvent), Interface, containerKeys)
+
     oc = OrderedBTreeContainer()
     oc['foo'] = 'FOO'
     assert keys['FOO'] == oc.keys() == ['foo']
@@ -57,11 +60,11 @@ def test_all_items_available_at_object_added_event():
 
 def test_exception_causes_order_fix():
 
-    @zope.component.adapter(IObjectAddedEvent)
-    def raiseException(event):
+    def raiseException(obj, event):
         raise RuntimeError()
 
-    zope.component.provideHandler(raiseException)
+    crom.implicit.registry.subscribe(
+        (Interface, IObjectAddedEvent), Interface, raiseException)
 
     oc = OrderedBTreeContainer()
     with pytest.raises(RuntimeError):
