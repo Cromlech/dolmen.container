@@ -19,7 +19,7 @@ class BTreeContainer(Container, Persistent):
     """
 
     def __init__(self):
-        Container.__init__(self)
+        super(BTreeContainer, self).__init__()
         self.__len = Length()
 
     def _create_container(self):

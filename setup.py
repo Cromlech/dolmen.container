@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 
-from setuptools import setup, find_packages, Extension
+from setuptools import setup, find_packages
 from os.path import join
 
 name = 'dolmen.container'
-version = '0.4+crom'
 
+version = '0.4.dev0'
 readme = open(join('src', 'dolmen', 'container', "README.txt")).read()
 history = open(join('docs', 'HISTORY.txt')).read()
 
 
 install_requires = [
-    'BTrees',
-    'ZODB >= 5',
-    'cromlech.container',
-    'persistent',
+    'ZODB >= 4',
     'setuptools',
     'zope.interface',
+    'cromlech.container',
+    'persistent >= 4.2',
+    'BTrees >= 4.4'
     ]
 
 tests_require = [
@@ -52,4 +52,4 @@ setup(name=name,
       extras_require={
           'test': tests_require,
           },
-      )
+)
