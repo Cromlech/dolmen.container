@@ -51,7 +51,8 @@ def test_all_items_available_at_object_added_event():
         keys[obj] = event.newParent.keys()
 
     crom.implicit.registry.subscribe(
-        (Interface, IObjectAddedEvent), Interface, containerKeys)
+        (Interface, IObjectAddedEvent),
+        cromlech.events.IEventHandler, containerKeys)
 
     oc = OrderedBTreeContainer()
     oc['foo'] = 'FOO'
@@ -64,7 +65,8 @@ def test_exception_causes_order_fix():
         raise RuntimeError()
 
     crom.implicit.registry.subscribe(
-        (Interface, IObjectAddedEvent), Interface, raiseException)
+        (Interface, IObjectAddedEvent),
+        cromlech.events.IEventHandler, raiseException)
 
     oc = OrderedBTreeContainer()
     with pytest.raises(RuntimeError):
